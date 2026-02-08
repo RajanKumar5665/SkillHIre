@@ -20,22 +20,20 @@ app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
 const allowedOrigins = [
-    process.env.FRONTEND_URL,
-    process.env.FRONTEND_URL_2,
+    'https://skill-h-ire.vercel.app',
     'http://localhost:5173'
-].filter(Boolean);
+];
 
-app.use(
-    cors({
-        origin: (origin, callback) => {
-            // Postman/curl/no-origin requests
-            if (!origin) return callback(null, true);
-            if (allowedOrigins.includes(origin)) return callback(null, true);
-            return callback(new Error(`CORS blocked for origin: ${origin}`));
-        },
-        credentials: true
-    })
-);
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        return callback(null, allowedOrigins.includes(origin));
+    },
+    credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 const PORT = process.env.PORT || 3000;
 
