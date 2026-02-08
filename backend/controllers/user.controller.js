@@ -100,7 +100,15 @@ export const login = async (req, res) => {
             profile: user.profile
         }
 
-        return res.status(200).cookie("token", token, { maxAge: 1 * 24 * 60 * 60 * 1000, httpOnly: true, sameSite: 'strict' }).json({
+        const isProduction = process.env.NODE_ENV === 'production';
+        const cookieOptions = {
+            maxAge: 1 * 24 * 60 * 60 * 1000,
+            httpOnly: true,
+            sameSite: isProduction ? 'none' : 'strict',
+            secure: isProduction
+        };
+
+        return res.status(200).cookie("token", token, cookieOptions).json({
             message: `Welcome back ${user.fullname}`,
             user,
             success: true
@@ -115,7 +123,13 @@ export const login = async (req, res) => {
 }
 export const logout = async (req, res) => {
     try {
-        return res.status(200).cookie("token", "", { maxAge: 0 }).json({
+        const isProduction = process.env.NODE_ENV === 'production';
+        return res.status(200).cookie("token", "", {
+            maxAge: 0,
+            httpOnly: true,
+            sameSite: isProduction ? 'none' : 'strict',
+            secure: isProduction
+        }).json({
             message: "Logged out successfully.",
             success: true
         })
