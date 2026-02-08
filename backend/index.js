@@ -12,28 +12,16 @@ dotenv.config({});
 
 const app = express();
 
-// Render/Proxy ke peeche secure cookies sahi kaam kare
-app.set('trust proxy', 1);
-
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
-const allowedOrigins = [
-    'https://skill-h-ire.vercel.app',
-    'http://localhost:5173'
-];
-
 const corsOptions = {
-    origin: (origin, callback) => {
-        if (!origin) return callback(null, true);
-        return callback(null, allowedOrigins.includes(origin));
-    },
-    credentials: true
-};
+    origin:'http://localhost:5173',
+    credentials:true
+}
 
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 
 const PORT = process.env.PORT || 3000;
 
