@@ -12,16 +12,30 @@ dotenv.config({});
 
 const app = express();
 
+// Render/Proxy ke peeche secure cookies sahi kaam kare
+app.set('trust proxy', 1);
+
 // middleware
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(cookieParser());
-const corsOptions = {
-    origin:'http://localhost:5173',
-    credentials:true
-}
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    process.env.FRONTEND_URL_2,
+    'http://localhost:5173'
+].filter(Boolean);
 
-app.use(cors(corsOptions));
+app.use(
+    cors({
+        origin: (origin, callback) => {
+            // Postman/curl/no-origin requests
+            if (!origin) return callback(null, true);
+            if (allowedOrigins.includes(origin)) return callback(null, true);
+            return callback(new Error(`CORS blocked for origin: ${origin}`));
+        },
+        credentials: true
+    })
+);
 
 const PORT = process.env.PORT || 3000;
 
